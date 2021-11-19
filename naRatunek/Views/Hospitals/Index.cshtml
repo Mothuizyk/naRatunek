@@ -1,0 +1,72 @@
+﻿@model IEnumerable<naRatunek.Models.Hospitals.Hospital>
+
+@{
+    ViewBag.Title = "Szpitale";
+}
+<br />
+<div class="row">
+
+    <div class="col-md-3">
+        <form action="~/Hospitals/Index" method="get">
+            <div class="input-group">
+                <input type="text" id="city" name="city" class="form-control" value="" placeholder="Szukaj">
+
+                <div class="input-group-btn">
+                    <button class="btn btn-danger" type="submit">
+                        <i class="glyphicon glyphicon-search"></i>
+                    </button>
+
+                </div>
+
+
+            </div>
+          
+        </form>
+    </div>
+
+</div>
+<br />
+<table id="table" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.HospitalName)
+            </th>
+            
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    <div class="media">
+                        <div class="media-left">
+                            <i class=" glyphicon glyphicon-alert"></i>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">@item.HospitalName</h4>
+                            <p><b>@item.Name</b></p>
+                            <p>Nawiguj do adresu: <a href="http://maps.google.com/maps?q=210+@item.Street+@item.StreetNumber+@item.PostalCode+@item.City">@item.Street @item.StreetNumber @item.PostalCode @item.City</a> </p>
+                            <p>Telefon: <a href="tel:@item.Telephone">@item.Telephone</a></p>
+                            <p><a href="mailto:@item.Email">@item.Email</a></p>
+                        </div>
+                    </div>
+                                       
+                </td>
+               
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#table').DataTable();
+        });
+    </script>
+}
