@@ -19,7 +19,7 @@ namespace naRatunek.Controllers
         // GET: Hospitals
         public async Task<ActionResult> Index(string city="")
         {
-          
+         
                 return View(await db.Hospitals.Where(x => x.City.ToUpper().Contains(city.ToUpper())).ToListAsync());
           
            

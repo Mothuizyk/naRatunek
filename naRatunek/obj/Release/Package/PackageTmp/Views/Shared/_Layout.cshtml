@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>naRatunek</title>
 
@@ -16,6 +17,16 @@
     <!--Added map OSP-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/css/ol.css" type="text/css">
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
+    <link rel="icon" type="image/svg" sizes="16x16" href="~/Imagaes/favicon.ico" />
+    <link rel="manifest" href="~/manifest.json" />
+    <link rel="apple-touch-icon" href="~/Imagaes/apple-touch-icon.png" />
+    <meta name="theme-color" content="white" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="naRatunek" />
+    <meta name="msapplication-TileImage" content="Imagaes/favicon.ico" />
+    <meta name="msapplication-TileColor" content="#FFFFFF" />
+
 
 
 </head>
@@ -52,6 +63,8 @@
     @Scripts.Render("~/bundles/bootstrap")
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+    <!--Registering Service Worker-->
+    <script src="~/Scripts/main.js"></script>
     @RenderSection("scripts", required: false)
 
 

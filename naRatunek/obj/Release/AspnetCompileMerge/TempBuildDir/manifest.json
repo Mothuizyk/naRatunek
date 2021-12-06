@@ -1,0 +1,42 @@
+{
+  "name": "naRatunek - Szpitale i Apteki",
+  "short_name": "naRatunek",
+  "icons": [
+    {
+      "src": "/Imagaes/maskable_icon_x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Imagaes/maskable_icon_x192.png",
+      "sizes": "192x191",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Imagaes/maskable_icon_x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+
+    },
+    {
+      "src": "/Imagaes/maskable_icon_x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Imagaes/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "lang": "en-US",
+  "start_url": "/Home/index.cshtml",
+  "display": "standalone",
+  "background_color": "white",
+  "theme_color": "white"
+}

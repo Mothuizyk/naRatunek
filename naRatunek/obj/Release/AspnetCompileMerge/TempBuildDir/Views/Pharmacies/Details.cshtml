@@ -1,0 +1,74 @@
+﻿@model naRatunek.Models.Pharmacy.Pharmacy
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Pharmacy</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.PharmacyName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PharmacyName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PharmacyType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PharmacyType)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.City)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.City)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PostalCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PostalCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Street)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Street)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StreetNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StreetNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FlatNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FlatNumber)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.PharmacyId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

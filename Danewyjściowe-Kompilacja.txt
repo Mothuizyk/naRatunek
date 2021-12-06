@@ -1,0 +1,20 @@
+﻿Rozpoczęto kompilację...
+1>------ Kompilacja rozpoczęta: Projekt: naRatunek, Konfiguracja: Release Any CPU ------
+1>  naRatunek -> C:\Users\60150523\source\repos\naRatunek\naRatunek\bin\naRatunek.dll
+2>------ Publikacja rozpoczęta: ProjektnaRatunek, Konfiguracja: Release Any CPU ------
+2>Przekształcono Web.config w obj\Release\TransformWebConfig\transformed\Web.config przy użyciu C:\Users\60150523\source\repos\naRatunek\naRatunek\Web.Release.config.
+2>Automatyczne parametry połączenia: przekształcono Views\Web.config w obj\Release\CSAutoParameterize\transformed\Views\Web.config.
+2>Automatyczne parametry połączenia: przekształcono obj\Release\TransformWebConfig\transformed\Web.config w obj\Release\CSAutoParameterize\transformed\Web.config.
+2>Kopiowanie wszystkich plików do poniższej lokalizacji tymczasowej na potrzeby pakowania/publikowania:
+2>obj\Release\Package\PackageTmp.
+2>Trwa rozpoczynanie publikowania za pomocą narzędzia Web Deploy aplikacji/pakietu w: https://naratunek.scm.azurewebsites.net/msdeploy.axd?site=naRatunek...
+2>Adding ACLs for path (naRatunek)
+2>Adding ACLs for path (naRatunek)
+2>Aktualizowanie pliku (naRatunek\Views\Web.config).
+2>Aktualizowanie pliku (naRatunek\Web.config).
+2>Adding ACLs for path (naRatunek)
+2>Adding ACLs for path (naRatunek)
+2>Publikowanie zostało zakończone pomyślnie.
+2>Aplikacja internetowa została pomyślnie opublikowana http://naratunek.azurewebsites.net/
+========== Kompilacja: 1 zakończono powodzeniem, 0 zakończono niepowodzeniem, 0 zaktualizowano, 0 pominięto ==========
+========== Publikowanie: 1 zakończono powodzeniem, 0 zakończono niepowodzeniem, 0 pominięto ==========

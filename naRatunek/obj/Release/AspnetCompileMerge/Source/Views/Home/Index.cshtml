@@ -1,0 +1,127 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<br />
+
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-3">
+                <form action="~/Home/Index" method="get">
+                    <div class="input-group">
+                        <input type="text" id="city" name="city" class="form-control" value="" placeholder="Szukaj" >
+
+                        <div class="input-group-btn">
+                            <button class="btn btn-danger" type="submit">
+                                <i class="glyphicon glyphicon-search"></i>
+                            </button>
+
+                        </div>
+
+
+                    </div>
+                    <label class="radio-inline"><input id="hospital" type="radio" name="optradio" value="H" checked>Szpitale</label>
+                    <label class="radio-inline"><input id="pharmacy" type="radio" name="optradio" value="P">Apteki</label>
+                </form>
+            </div>
+
+        </div>
+        <br />
+        <div id="map" style="height:400px;width:100%"></div>
+        <div id="popup" class="ol-popup">
+            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+            <div id="popup-content"></div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+   
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+
+    } else {
+        alert('Geolocation is not supported in this browser');
+    }
+    function showPosition(position) {
+
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]),
+                zoom: 15
+            })
+        });
+        //adding marker
+        var layer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [
+                    new ol.Feature({
+                        geometry: new ol.geom.Point(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]))
+                    })
+                ]
+            })
+        });
+        map.addLayer(layer);
+
+        var container = document.getElementById('popup');
+        var content = document.getElementById('popup-content');
+        var closer = document.getElementById('popup-closer');
+
+        var overlay = new ol.Overlay({
+            element: container,
+            autoPan: true,
+            autoPanAnimation: {
+                duration: 250
+            }
+        });
+        map.addOverlay(overlay);
+
+        closer.onclick = function () {
+            overlay.setPosition(undefined);
+            closer.blur();
+            return false;
+        };
+
+        //map.on('singleclick', function (event) {
+        //    if (map.hasFeatureAtPixel(event.pixel) === true) {
+        //        var coordinate = event.coordinate;
+
+        //        content.innerHTML = '<b>Hello world!</b><br />I am a popup.';
+        //        overlay.setPosition(coordinate);
+        //    } else {
+        //        overlay.setPosition(undefined);
+        //        closer.blur();
+        //    }
+        //});
+        simpleReverseGeocoding(position.coords.longitude, position.coords.latitude);
+        content.innerHTML = '<b>Witaj!</b><br />Tutaj jesteś.';
+        overlay.setPosition(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]));
+
+    };
+    function showError(error) {
+        alert(error);
+    };
+    function simpleReverseGeocoding(lon, lat) {
+        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lon=' + lon + '&lat=' + lat).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+           
+            
+            document.getElementById('city').value = json.address.city_district;
+        
+        })
+    };
+
+   
+</script>
+
+
+
+
