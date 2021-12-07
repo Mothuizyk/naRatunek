@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "secrets1": {
+      "restored": true,
+      "restoreTime": "2021-12-04T07:51:35.3703797Z"
+    },
+    "mssql1": {
+      "restored": true,
+      "restoreTime": "2021-12-04T07:51:49.311064Z"
+    }
+  },
+  "parameters": {
+    "mssql1.subscriptionId": {
+      "Name": "mssql1.subscriptionId",
+      "Type": "subscription",
+      "Value": "4ea2461e-3fcf-4c15-a1ef-ada7c1fade12"
+    },
+    "mssql1.resourceGroupName": {
+      "Name": "mssql1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "naRatunek"
+    }
+  }
+}
