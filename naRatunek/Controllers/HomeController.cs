@@ -17,6 +17,18 @@ namespace naRatunek.Controllers
 {
     public class HomeController : Controller
     {
+        /// <summary>
+        /// inicjalizacja bazy danych
+        /// Index jest to funkcja domyślna uruchamiana na starcie aplikacji, w tym przypadku domyślnie do niej wysyłane są dane z formularza.
+        /// Jeśli użytkownik wybrał już miasto i typ obiektów to w zależności od tych danych zwracane są one w ViewBag.Obiekty.
+        /// 
+        /// GetAll to funkcja pobierająca wszystkie obiekty z danego miasta i mające pierwsze 4 znaki kodu pocztowego takie same jak ten przypisany do lokalizacji użytkownika.
+        /// 
+        /// GetHospitals i GetPharmacies to funkcje pomocnicze korzystające z modeli danych zawartych w bazie, symulacja zapytań SQL.
+        /// 
+        /// Pobierane dane zamieniane są w String z ustalonymi rozdzieleniami (symulacja CSV) by potem łatwiej przyporządkować dane.
+        /// 
+        /// </summary>
         private naRatunekContext db = new naRatunekContext();
 
         public async Task<ActionResult> Index(string city, string obiekt)
@@ -24,7 +36,6 @@ namespace naRatunek.Controllers
             if(city == "")
             {
                 ViewBag.Obiekty = "";
-                ViewBag.Check = false;
                 return View();
             }
             else
@@ -37,7 +48,6 @@ namespace naRatunek.Controllers
                 {
                     ViewBag.Obiekty = GetPharmacies(city);
                 }
-                ViewBag.Check = true;
                 return View();
             }
         }

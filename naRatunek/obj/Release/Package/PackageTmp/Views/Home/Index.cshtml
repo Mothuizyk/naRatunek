@@ -3,10 +3,9 @@
     ViewBag.Title = "Home Page";
 }
 <br />
-
+<!--wyswietlenie formularza szukajki-->
 <div class="container">
     <div class="row">
-
         <div class="col-md-3">
             <form action="~/Home/Index" method="POST">
                 <div class="input-group">
@@ -34,195 +33,246 @@
         <div id="popup-content"></div>
     </div>
 </div>
-
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94&callback=googleMap"></script>
+<div id="map" style="width: 600px; height: 400px;"></div>
+<!---załadowanie skryptów zewnętrznych Google-->
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
-<div id="map" style="width:100%;height:400px;"></div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94&"></script>
 
 <script>
-    var map;
-var marker;
-var destination;
-const iconBase = "http://maps.google.com/mapfiles/kml/paddle/";
 
-var start = 0;
+    let map;
+    var tiles;
+    let uzytkownik;
+    ///sprawdzenie czy przeglądarka obsługuje geolokalizacje - nie czy użytkownik zezwolił
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
 
-function showPosition(position) {
+    } else {
+        alert('Geolocation is not supported in this browser');
+    }
+    ///funkcja wyświetlająca komunikat gdy użytkownik odmówił użycia lokalizacji
+    function showError(error) {
+        alert("Wymagane jest udostępnienie lokalizacji do poprawnego działania");
 
-    var userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
-    if (start == 0) {
-        googleMap();
-        function googleMap() {
-            var mapProp = {
-                center: userLocation,
-                zoom: 15
-            };
-            map = new google.maps.Map(document.getElementById("map"), mapProp);
-            marker = new google.maps.Marker({ position: userLocation, map: map, icon: iconBase + 'blu-blank.png' });
-            start++;
+    };
+
+    ///funkcja licząca odległość między pozycją użytkownika a danym punktem (https://stackoverflow.com/questions/18883601/function-to-calculate-distance-between-two-coordinates)
+    function calcDistance(end, poczatek, callback) {
+        var lat2;
+        var lng2;
+        var results;
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180)
         }
-    }
-    else {
-        var intervalId = window.setInterval(function () {
-            marker.setPosition(userLocation);
-        }, 5000);
-    }
-}
-
-function calcDistance(end, poczatek, callback) {
-    var lat2;
-    var lng2;
-    var results;
-
-    function deg2rad(deg) {
-        return deg * (Math.PI / 180)
-    }
-
-    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2, callback) {
-        var R = 6371; // Radius of the earth in km
-        var dLat = deg2rad(lat2 - lat1);  // deg2rad below
-        var dLon = deg2rad(lon2 - lon1);
-        var a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2)
-            ;
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        results = R * c; // Distance in km
-        callback(results);
-    }
-    axios.get("https://maps.googleapis.com/maps/api/geocode/json",
-        {
-            params:
-            {
-                address: end,
-                key: 'AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94'
-            }
-        })
-        .then(function (response) {
-            lat2 = response.data.results[0].geometry.location.lat;
-            lng2 = response.data.results[0].geometry.location.lng;
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-    (async () => {
-        while (typeof lat2 === "undefined" && typeof lon1 === "undefined") // define the condition as you like
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        getDistanceFromLatLonInKm(poczatek.lat, poczatek.lng, lat2, lng2, function (results) {
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2, callback) {
+            var R = 6371; // Radius of the earth in km
+            var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+                ;
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            results = R * c; // Distance in km
             callback(results);
-        }
-        )
-    })()
-        ;
-    return end;
-}
-
-//function used to retrieve the coordinates of places
-function geocode(dane) {
-
-    var location = dane[2];
-    var typ = dane[0];
-    var opis = dane[1]
-    if (opis == "") {
-        opis = typ;
-    }
-    axios.get("https://maps.googleapis.com/maps/api/geocode/json",
-        {
-            params:
+            return false;
+        }///pobranie wspołrzędnych przy wykorzystaniu API Google
+        axios.get("https://maps.googleapis.com/maps/api/geocode/json",
             {
-                address: location,
-                key: 'AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94'
-            }
-        })
-        .then(function (response) {
-            const infoWindow = new google.maps.InfoWindow();
-            //formatted stuff
-            destination = { lat: response.data.results[0].geometry.location.lat, lng: response.data.results[0].geometry.location.lng };
-            var url = 'https://www.google.pl/maps/search/' + dane[2];
-            var marker;
-            if (typ == ",Apteka") {
-                marker = new google.maps.Marker({position: destination, map: map, icon: "http://maps.google.com/mapfiles/kml/pal3/icon46.png", optimized: false, title: opis });
-            }
-            else {
-                marker = new google.maps.Marker({ position: destination, map: map, icon: "http://maps.google.com/mapfiles/kml/shapes/hospitals.png", optimized: false, title: opis });
-            }
-            marker.addListener("click", () => {
-                infoWindow.close();
-                infoWindow.setContent(marker.getTitle() + '<p><h4><a target="_blank" href="' + url + '">Pokaż drogę</a></h4>');
-                infoWindow.open(marker.getMap(), marker);
-            });
-
-
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-}
-
-//get current location
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-
-} else {
-    alert('Geolocation is not supported in this browser');
-}
-
-
-var model = '@Html.Raw(Json.Encode(ViewBag.Obiekty))';
-model = model.split(";_");
-    if (model.length > 1) {
-    for (i = 0; i < model.length; i++) {
-        if (model[i] != '') {
-
-            geocode(model[i].split(";"));
-
-        }
-    }
-}
-else {
-    (async () => {
-        while (typeof marker === "undefined") // define the condition as you like
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        const latlng = {
-            lat: marker.getPosition().lat(),
-            lng: marker.getPosition().lng(),
-        };
-        var zip;
-        var miasto;
-        var geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ 'latLng': latlng }, function (results, status) {
-            if (status !== google.maps.GeocoderStatus.OK) {
-                alert(status);
-            }
-            // This is checking to see if the Geoeode Status is OK before proceeding
-            if (status == google.maps.GeocoderStatus.OK) {
-                miasto = results[0].address_components[3].long_name;
-                zip = results[0].address_components[7].long_name;
-            }
-            var wszystko;
-            $.get("/Home/GetAll", { city: miasto, zip: zip }, function (data) {
-                wszystko = data.split(";_");
-            });
-            (async () => {
-                while (typeof wszystko === "undefined") // define the condition as you like
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                for (i = 0; i < wszystko.length; i++) {
-                    if (wszystko[i] != '') {
-                        const test = wszystko[i];
-                        calcDistance(test.split(";")[2], latlng, function (results) {
-                            if (results < 5) {
-                                geocode(test.split(";"));
-                            }
-                        })
-
-                    }
+                params:
+                {
+                    address: end,
+                    key: 'AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94'
                 }
-            })()
+            })
+            .then(function (response) {
+                lat2 = response.data.results[0].geometry.location.lat;
+                lng2 = response.data.results[0].geometry.location.lng;
+                return false;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });///async służy do wstrzymywania kodu zawartego w orzekiwaniu na zmianę zmiennych, np. tutaj z undefined; oczekiwanie na dane po prostu
+        (async () => {
+            while (typeof lat2 === "undefined" && typeof lon1 === "undefined") // define the condition as you like
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            getDistanceFromLatLonInKm(poczatek.lat, poczatek.lng, lat2, lng2, function (results) {
+                callback(results);///callback to alternatywa dla async dla funkcji, jak return tylko dopiero jak będzie zdefiniowana zmienna
+            }
+            )
+        })()
+            ;
+        return false;
+    }
 
+    ///funkcja pobierająca wspołrzędne dla adresu i umieszczająca pinezki na mapie
+    function geocode(dane) {
 
+        var location = dane[2];
+        var apteka = L.icon({
+            iconUrl: 'https://maps.google.com/mapfiles/kml/pal3/icon46.png',
+
+            iconSize: [38, 45], // size of the icon
+            popupAnchor: [13, 0] // point from which the popup should open relative to the iconAnchor
         });
+        var szpital = L.icon({
+            iconUrl: 'https://maps.google.com/mapfiles/kml/shapes/hospitals.png',
+
+            iconSize: [38, 45], // size of the icon
+            popupAnchor: [13, 0] // point from which the popup should open relative to the iconAnchor
+        });
+        var typ = dane[0];
+        var opis = dane[1]
+        if (opis == "") {
+            opis = typ;
+        }
+
+        axios.get("https://maps.googleapis.com/maps/api/geocode/json",
+            {
+                params:
+                {
+                    address: location,
+                    key: 'AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94'
+                }
+            })
+            .then(function (response) {
+                //formatted stuff
+                (async () => {
+                    while (typeof response.data.results[0] === "undefined") // define the condition as you like
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    destination = { lat: response.data.results[0].geometry.location.lat, lng: response.data.results[0].geometry.location.lng };
+                    var url = 'https://www.google.pl/maps/search/' + dane[2];
+                    var pinezka;
+                    var pinezki = L.layerGroup();
+                    if (typ.includes("Apteka")) {
+                        pinezka = L.marker([destination.lat, destination.lng]).setIcon(apteka);
+                    }
+                    else {
+                        pinezka = L.marker([destination.lat, destination.lng]).setIcon(szpital);
+                    }
+                    pinezki.addLayer(pinezka);
+                    pinezka.bindPopup("<center>" + opis + '<p><h4><a target="_blank" href="' + url + '">Pokaż drogę</a></h4></center>');
+                    pinezki.addTo(map);
+                   
+                })()
+                return false;
+
+
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    ///inicjalizacja mapy i pozycji użytkownika
+    function showPosition(position)
+    {
+        map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 15);
+        tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibW90aHVpenlrIiwiYSI6ImNreDRvczdtdzB6MTkybm8xN3UwbHhuazkifQ.fA-YxfkAg4NEqsjsyXX8Jw',
+        {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1
+            }).addTo(map);
+
+        var current_position, current_accuracy;
+        
+        function onLocationFound(e) {
+            // if position defined, then remove the existing position marker and accuracy circle from the map
+            if (current_position) {
+                map.removeLayer(current_position);
+                map.removeLayer(current_accuracy);
+            }
+
+            var radius = e.accuracy / 2;
+
+            current_position = L.marker(e.latlng).addTo(map)
+                .bindPopup("Jesteś w odległości " + radius + " metrów od tego punktu");
+
+            uzytkownik = current_position;
+            current_accuracy = L.circle(e.latlng, radius).addTo(map);
+        }
+
+        function onLocationError(e) {
+            alert(e.message);
+        }
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+
+        // wrap map.locate in a function
+        function locate() {
+            map.locate();
+        }
+
+        // call locate every 3 seconds... forever ; zapewnia aktualizacje pozycji użytkownika podczas przemieszczania się
+        setInterval(locate, 3000);
+    }
+
+///pobieranie danych, inicjalizacja mapy, wykonywanie logiki
+(async () => {
+    while (typeof map === "undefined") // define the condition as you like
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        ///jeśli użytkownik wystosował konkretne żądanie
+        var model = '@Html.Raw(Json.Encode(ViewBag.Obiekty))';
+        model = model.split(";_");
+        if (model.length > 1) {
+            for (i = 0; i < model.length; i++) {
+                if (model[i] != '"]' && model[i] != '') {
+                    ///umieszczanie pinezek
+                    geocode(model[i].split(";"));
+
+                }
+            }
+        }///jeśli użytkownik jedynie uruchomił aplikację więc pobieramy wszystkie obiekty w promieniu 5 km mające podobny kod pocztowy co on
+        else {
+            (async () => {
+                while (typeof uzytkownik === "undefined") // define the condition as you like
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                const latlng = uzytkownik.getLatLng();//pobranie aktualnej pozycji użytkownika
+                var zip;
+                var miasto;
+                var geocoder = new google.maps.Geocoder();//znalezienie kodu pocztowego na podstawie lokalizacji użytkownika ; reverse geocoding
+                geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+                    if (status !== google.maps.GeocoderStatus.OK) {
+                        alert(status);
+                    }
+                    // This is checking to see if the Geoeode Status is OK before proceeding
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        miasto = results[0].address_components[3].long_name;
+                        zip = results[0].address_components[7].long_name;
+                    }
+                    var wszystko;
+                    ///pobranie wszystkich obiektów mające takie samo miasto i podobny kod pocztowy
+                    $.get("/Home/GetAll", { city: miasto, zip: zip }, function (data) {
+                        wszystko = data.split(";_");
+                    });
+                    (async () => {
+                        while (typeof wszystko === "undefined") // define the condition as you like
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        for (i = 0; i < wszystko.length; i++) {
+                            if (wszystko[i] != '') {
+                                const test = wszystko[i];
+                                calcDistance(test.split(";")[2], latlng, function (results) {
+                                    if (results < 5) {
+                                        geocode(test.split(";"));
+                                    }
+                                })
+
+                            }
+                        }
+                    })()
+
+
+                });
+            })();
+        }
     })();
-}
+
 </script>
