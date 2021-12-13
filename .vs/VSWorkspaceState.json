@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\naRatunek",
+    "\\naRatunek\\Views",
+    "\\naRatunek\\Views\\Home"
   ],
-  "SelectedNode": "\\naRatunek.sln",
+  "SelectedNode": "\\naRatunek\\Views\\Home\\Index.cshtml",
   "PreviewInSolutionExplorer": false
 }

@@ -1,127 +1,228 @@
-﻿@{
+﻿
+@{
     ViewBag.Title = "Home Page";
 }
 <br />
 
+<div class="container">
+    <div class="row">
 
-    <div class="container">
-        <div class="row">
+        <div class="col-md-3">
+            <form action="~/Home/Index" method="POST">
+                <div class="input-group">
+                    <input type="text" id="city" name="city" class="form-control" value="" placeholder="Szukaj">
 
-            <div class="col-md-3">
-                <form action="~/Home/Index" method="get">
-                    <div class="input-group">
-                        <input type="text" id="city" name="city" class="form-control" value="" placeholder="Szukaj" >
-
-                        <div class="input-group-btn">
-                            <button class="btn btn-danger" type="submit">
-                                <i class="glyphicon glyphicon-search"></i>
-                            </button>
-
-                        </div>
-
+                    <div class="input-group-btn">
+                        <button class="btn btn-danger" type="submit">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
 
                     </div>
-                    <label class="radio-inline"><input id="hospital" type="radio" name="optradio" value="H" checked>Szpitale</label>
-                    <label class="radio-inline"><input id="pharmacy" type="radio" name="optradio" value="P">Apteki</label>
-                </form>
-            </div>
+                </div>
+                <input type="radio" id="contactChoice1" name="obiekt" value="Szpitale">
+                <label for="contactChoice1">Szpitale</label>
+                <input type="radio" id="contactChoice2" name="obiekt" value="Apteki">
+                <label for="contactChoice2">Apteki</label>
+            </form>
+        </div>
 
-        </div>
-        <br />
-        <div id="map" style="height:400px;width:100%"></div>
-        <div id="popup" class="ol-popup">
-            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-            <div id="popup-content"></div>
-        </div>
     </div>
+    <br />
+    <div id="map" style="height:400px;width:100%"></div>
+    <div id="popup" class="ol-popup">
+        <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+        <div id="popup-content"></div>
+    </div>
+</div>
 
-<script type="text/javascript">
-   
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94&callback=googleMap"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+<div id="map" style="width:100%;height:400px;"></div>
 
-    } else {
-        alert('Geolocation is not supported in this browser');
-    }
-    function showPosition(position) {
+<script>
+    var map;
+var marker;
+var destination;
+const iconBase = "http://maps.google.com/mapfiles/kml/paddle/";
 
-        var map = new ol.Map({
-            target: 'map',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM()
-                })
-            ],
-            view: new ol.View({
-                center: ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]),
+var start = 0;
+
+function showPosition(position) {
+
+    var userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
+    if (start == 0) {
+        googleMap();
+        function googleMap() {
+            var mapProp = {
+                center: userLocation,
                 zoom: 15
-            })
-        });
-        //adding marker
-        var layer = new ol.layer.Vector({
-            source: new ol.source.Vector({
-                features: [
-                    new ol.Feature({
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]))
-                    })
-                ]
-            })
-        });
-        map.addLayer(layer);
+            };
+            map = new google.maps.Map(document.getElementById("map"), mapProp);
+            marker = new google.maps.Marker({ position: userLocation, map: map, icon: iconBase + 'blu-blank.png' });
+            start++;
+        }
+    }
+    else {
+        var intervalId = window.setInterval(function () {
+            marker.setPosition(userLocation);
+        }, 5000);
+    }
+}
 
-        var container = document.getElementById('popup');
-        var content = document.getElementById('popup-content');
-        var closer = document.getElementById('popup-closer');
+function calcDistance(end, poczatek, callback) {
+    var lat2;
+    var lng2;
+    var results;
 
-        var overlay = new ol.Overlay({
-            element: container,
-            autoPan: true,
-            autoPanAnimation: {
-                duration: 250
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180)
+    }
+
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2, callback) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+        var dLon = deg2rad(lon2 - lon1);
+        var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2)
+            ;
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        results = R * c; // Distance in km
+        callback(results);
+    }
+    axios.get("https://maps.googleapis.com/maps/api/geocode/json",
+        {
+            params:
+            {
+                address: end,
+                key: 'AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94'
             }
-        });
-        map.addOverlay(overlay);
-
-        closer.onclick = function () {
-            overlay.setPosition(undefined);
-            closer.blur();
-            return false;
-        };
-
-        //map.on('singleclick', function (event) {
-        //    if (map.hasFeatureAtPixel(event.pixel) === true) {
-        //        var coordinate = event.coordinate;
-
-        //        content.innerHTML = '<b>Hello world!</b><br />I am a popup.';
-        //        overlay.setPosition(coordinate);
-        //    } else {
-        //        overlay.setPosition(undefined);
-        //        closer.blur();
-        //    }
-        //});
-        simpleReverseGeocoding(position.coords.longitude, position.coords.latitude);
-        content.innerHTML = '<b>Witaj!</b><br />Tutaj jesteś.';
-        overlay.setPosition(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]));
-
-    };
-    function showError(error) {
-        alert(error);
-    };
-    function simpleReverseGeocoding(lon, lat) {
-        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lon=' + lon + '&lat=' + lat).then(function (response) {
-            return response.json();
-        }).then(function (json) {
-           
-            
-            document.getElementById('city').value = json.address.city_district;
-        
         })
-    };
+        .then(function (response) {
+            lat2 = response.data.results[0].geometry.location.lat;
+            lng2 = response.data.results[0].geometry.location.lng;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    (async () => {
+        while (typeof lat2 === "undefined" && typeof lon1 === "undefined") // define the condition as you like
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        getDistanceFromLatLonInKm(poczatek.lat, poczatek.lng, lat2, lng2, function (results) {
+            callback(results);
+        }
+        )
+    })()
+        ;
+    return end;
+}
 
-   
+//function used to retrieve the coordinates of places
+function geocode(dane) {
+
+    var location = dane[2];
+    var typ = dane[0];
+    var opis = dane[1]
+    if (opis == "") {
+        opis = typ;
+    }
+    axios.get("https://maps.googleapis.com/maps/api/geocode/json",
+        {
+            params:
+            {
+                address: location,
+                key: 'AIzaSyDnOtV5TFxLobutxoh5va6vbeN5zT09M94'
+            }
+        })
+        .then(function (response) {
+            const infoWindow = new google.maps.InfoWindow();
+            //formatted stuff
+            destination = { lat: response.data.results[0].geometry.location.lat, lng: response.data.results[0].geometry.location.lng };
+            var url = 'https://www.google.pl/maps/search/' + dane[2];
+            var marker;
+            if (typ == ",Apteka") {
+                marker = new google.maps.Marker({position: destination, map: map, icon: "http://maps.google.com/mapfiles/kml/pal3/icon46.png", optimized: false, title: opis });
+            }
+            else {
+                marker = new google.maps.Marker({ position: destination, map: map, icon: "http://maps.google.com/mapfiles/kml/shapes/hospitals.png", optimized: false, title: opis });
+            }
+            marker.addListener("click", () => {
+                infoWindow.close();
+                infoWindow.setContent(marker.getTitle() + '<p><h4><a target="_blank" href="' + url + '">Pokaż drogę</a></h4>');
+                infoWindow.open(marker.getMap(), marker);
+            });
+
+
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
+//get current location
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+
+} else {
+    alert('Geolocation is not supported in this browser');
+}
+
+
+var model = '@Html.Raw(Json.Encode(ViewBag.Obiekty))';
+model = model.split(";_");
+    if (model.length > 1) {
+    for (i = 0; i < model.length; i++) {
+        if (model[i] != '') {
+
+            geocode(model[i].split(";"));
+
+        }
+    }
+}
+else {
+    (async () => {
+        while (typeof marker === "undefined") // define the condition as you like
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        const latlng = {
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng(),
+        };
+        var zip;
+        var miasto;
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+            if (status !== google.maps.GeocoderStatus.OK) {
+                alert(status);
+            }
+            // This is checking to see if the Geoeode Status is OK before proceeding
+            if (status == google.maps.GeocoderStatus.OK) {
+                miasto = results[0].address_components[3].long_name;
+                zip = results[0].address_components[7].long_name;
+            }
+            var wszystko;
+            $.get("/Home/GetAll", { city: miasto, zip: zip }, function (data) {
+                wszystko = data.split(";_");
+            });
+            (async () => {
+                while (typeof wszystko === "undefined") // define the condition as you like
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                for (i = 0; i < wszystko.length; i++) {
+                    if (wszystko[i] != '') {
+                        const test = wszystko[i];
+                        calcDistance(test.split(";")[2], latlng, function (results) {
+                            if (results < 5) {
+                                geocode(test.split(";"));
+                            }
+                        })
+
+                    }
+                }
+            })()
+
+
+        });
+    })();
+}
 </script>
-
-
-
-

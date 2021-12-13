@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using naRatunek.Data;
 using naRatunek.Models.Hospitals;
 
+
 namespace naRatunek.Controllers
 {
     public class HospitalsController : Controller
@@ -17,14 +18,14 @@ namespace naRatunek.Controllers
         private naRatunekContext db = new naRatunekContext();
 
         // GET: Hospitals
-        public async Task<ActionResult> Index(string city="")
-        {
-         
-                return View(await db.Hospitals.Where(x => x.City.ToUpper().Contains(city.ToUpper())).ToListAsync());
-          
-           
-        }
 
+        public async Task<ActionResult> Index(string city = "")
+        {
+
+            return View(await db.Hospitals.Where(x => x.City.ToUpper().Contains(city.ToUpper())).ToListAsync());
+
+
+        }
         // GET: Hospitals/Details/5
         public async Task<ActionResult> Details(int? id)
         {

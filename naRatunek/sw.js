@@ -2,10 +2,7 @@
 var CACHE_DYNAMIC_NAME = 'dynamic-v74';
 var filesToCache = [
     '/',
-    '/Home/index.cshtml',
-    '/Hospitals/index.cshtml',
-    '/Pharmacies/index.cshtml',
-    '/Home/contact.html'
+     '/Home/contact.html'
 ];
 
 self.addEventListener('install', function (event) {

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
   <parameter name="naRatunekContext-Web.config Connection String" description="naRatunekContext Parametry połączenia używane w pliku web.config przez aplikację w celu uzyskiwania dostępu do bazy danych." defaultValue="Data Source=sqlratunek.database.windows.net;Initial Catalog=sqlnaratunek;Persist Security Info=False;User ID=vistula;Password=naRatunek1;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False" tags="SqlConnectionString">
-    <parameterEntry kind="XmlFile" scope="C:\\Users\\60150523\\source\\repos\\naRatunek\\naRatunek\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='naRatunekContext']/@connectionString" />
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\Moth\\source\\repos\\Mothuizyk\\naRatunek\\naRatunek\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='naRatunekContext']/@connectionString" />
   </parameter>
 </parameters>
